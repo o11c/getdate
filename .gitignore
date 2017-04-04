@@ -1,3 +1,4 @@
 *.o
 *.so
 *-parser.[ch]
+*.pyc

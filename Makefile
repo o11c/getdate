@@ -23,7 +23,7 @@ override LDLIBS += $(shell ${PYTHON}-config --libs)
 .SECONDARY:
 .SUFFIXES:
 
-all: getdate.so
+all: libgetdate.so
 
 clean:
 	rm -f *.o *.so
@@ -42,14 +42,13 @@ distclean: clean
 %.so:
 	${CC} ${LDFLAGS} $^ ${LDLIBS} -o $@
 
-getdate.so: getdate.o getdate-parser.o getdate-lexer.o
+libgetdate.so: getdate-parser.o getdate-lexer.o
 getdate-lexer.o: getdate-lexer.c getdate-parser.h
-getdate.o: getdate.c getdate-parser.h
 
 # TODO - should use setup.py to take care of this
-install: getdate.so
-	install getdate.so $(shell ${PYTHON} -c 'import site; print(site.getsitepackages()[0])')
-	#install getdate.so $(shell ${PYTHON} -c 'import site; print(site.getusersitepackages())')
+install: libgetdate.so
+	install libgetdate.so $(shell ${PYTHON} -c 'import site; print(site.getsitepackages()[0])')
+	#install libgetdate.so $(shell ${PYTHON} -c 'import site; print(site.getusersitepackages())')
 
 release:
 	echo -n "making a new release of $(PROJECT): ";\

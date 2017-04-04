@@ -72,6 +72,7 @@ time_t	yyRelSeconds;
 
 %code provides {
 int getdate_yylex (YYSTYPE *yylval);
+__attribute__((visibility("default")))
 time_t get_date(char *, struct timeb *);
 }
 
