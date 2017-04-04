@@ -4,28 +4,44 @@ export PROJECTRELEASEDIR = /nfs/gate/projects.zoidtechnologies.com/80/html/$(PRO
 export datestamp = $(shell date +%Y%m%d-%H%M)
 export archivename = $(PROJECT)-$(datestamp)-$(USER)
 
+
+CC = gcc
+CFLAGS = -g -O2
+CPPFLAGS =
+LDFLAGS =
+LDLIBS =
+YACC = yacc
+PYTHON = python
+
+CFLAGS += -Wall
+override CFLAGS += -fPIC
+override CPPFLAGS += $(shell ${PYTHON}-config --includes)
+override LDFLAGS += -shared
+
+.SECONDARY:
+.SUFFIXES:
+
 all: getdate.so
 
 clean:
-	-rm -f *.o *~ a.out core getdate.tab.*
+	rm -f *.o *.so
 
 distclean: clean
-	-rm -f getdate.so
+	rm -f *.tab.[ch]
 
-getdate.tab.c: getdate.y
-	bison --output-file=getdate.tab.c getdate.y
-
-getdate.tab.o: getdate.tab.c
-	gcc -Wall -shared -fPIC -c -o getdate.tab.o getdate.tab.c
-
-getdate.o: getdate.c
-	gcc -Wall -shared -fPIC -c -I/usr/include/python2.4/ -o getdate.o getdate.c
+%.tab.c: %.y
+	${YACC} -o $@ $<
+%.o: %.c
+	${CC} ${CFLAGS} ${CPPFLAGS} -c -o $@ $<
+%.so:
+	${CC} ${LDFLAGS} $^ ${LDLIBS} -o $@
 
 getdate.so: getdate.o getdate.tab.o
-	gcc -shared -fPIC -o getdate.so getdate.o getdate.tab.o
 
+# TODO - should use setup.py to take care of this
 install: getdate.so
-	install getdate.so /usr/lib/python2.4/site-packages/
+	install getdate.so $(shell ${PYTHON} -c 'import site; print(site.getsitepackages()[0])')
+	#install getdate.so $(shell ${PYTHON} -c 'import site; print(site.getusersitepackages())')
 
 release:
 	echo -n "making a new release of $(PROJECT): ";\

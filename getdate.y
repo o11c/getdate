@@ -144,6 +144,8 @@ static time_t	yyRelSeconds;
 
 %}
 
+%expect 10
+
 %union {
     time_t		Number;
     enum _MERIDIAN	Meridian;
