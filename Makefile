@@ -14,7 +14,7 @@ LEX = lex
 YACC = yacc
 PYTHON = python
 
-CFLAGS += -Wall -Wextra
+CFLAGS += -Wall -Wextra -Werror=missing-prototypes -Werror=missing-declarations -Werror=redundant-decls
 override CFLAGS += -fPIC -fvisibility=hidden
 override CPPFLAGS += $(shell ${PYTHON}-config --includes)
 override LDFLAGS += -shared -Wl,-z,defs
@@ -44,6 +44,7 @@ distclean: clean
 
 getdate.so: getdate.o getdate-parser.o getdate-lexer.o
 getdate-lexer.o: getdate-lexer.c getdate-parser.h
+getdate.o: getdate.c getdate-parser.h
 
 # TODO - should use setup.py to take care of this
 install: getdate.so

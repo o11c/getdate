@@ -14,80 +14,17 @@
 /* SUPPRESS 287 on yaccpar_sccsid *//* Unused static variable */
 /* SUPPRESS 288 on yyerrlab *//* Label unused */
 
-#ifdef HAVE_CONFIG_H
-#if defined (emacs) || defined (CONFIG_BROKETS)
-#include <config.h>
-#else
-#include "config.h"
-#endif
-#endif
-
-/* Since the code of getdate.y is not included in the Emacs executable
-   itself, there is no need to #define static in this file.  Even if
-   the code were included in the Emacs executable, it probably
-   wouldn't do any harm to #undef it here; this will only cause
-   problems if we try to write to a static variable, which I don't
-   think this code needs to do.  */
-#ifdef emacs
-#undef static
-#endif
-
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include <time.h>
 
-/* The code at the top of get_date which figures out the offset of the
-   current time zone checks various CPP symbols to see if special
-   tricks are need, but defaults to using the gettimeofday system call.
-   Include <sys/time.h> if that will be used.  */
-
-#if	defined(vms)
-# include <types.h>
-#else /* defined(vms) */
-# include <sys/types.h>
-#endif	/* !defined(vms) */
-# include "xtime.h"
-
-#if defined (STDC_HEADERS) || defined (USG)
-#include <string.h>
-#endif
-
-/* Some old versions of bison generate parsers that use bcopy.
-   That loses on systems that don't provide the function, so we have
-   to redefine it here.  */
-#if !defined (HAVE_BCOPY) && defined (HAVE_MEMCPY) && !defined (bcopy)
-#define bcopy(from, to, len) memcpy ((to), (from), (len))
-#endif
-
-#if defined (STDC_HEADERS)
-#include <stdlib.h>
-#endif
-
-/* NOTES on rebuilding getdate.c (particularly for inclusion in CVS
-   releases):
-
-   We don't want to mess with all the portability hassles of alloca.
-   In particular, most (all?) versions of bison will use alloca in
-   their parser.  If bison works on your system (e.g. it should work
-   with gcc), then go ahead and use it, but the more general solution
-   is to use byacc instead of bison, which should generate a portable
-   parser.  I played with adding "#define alloca dont_use_alloca", to
-   give an error if the parser generator uses alloca (and thus detect
-   unportable getdate.c's), but that seems to cause as many problems
-   as it solves.  */
-
-extern struct tm	*gmtime();
-extern struct tm	*localtime();
-
-static int yyparse ();
-static int yyerror ();
+static int yyerror (char *);
 
 #define EPOCH		1970
 #define SECSPERDAY	(24L * 60L * 60L)
 %}
 
 %code requires {
+#include <sys/timeb.h>
 #include <sys/types.h>
 
 /*
@@ -132,7 +69,8 @@ time_t	yyRelMonth;
 time_t	yyRelSeconds;
 
 
-int getdate_yylex ();
+int getdate_yylex (void);
+time_t get_date(char *, struct timeb *);
 }
 
 %expect 10

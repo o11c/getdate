@@ -1,8 +1,13 @@
 #include "Python.h"
-#include "xtime.h"
+
+#include "getdate-parser.h"
+
+__attribute__((visibility("default")))
+void
+initgetdate(void);
+
 
 static PyObject *ErrorObject;
-extern time_t get_date(char *, struct timeb *);
 
 /* ----------------------------------------------------- */
 
@@ -44,9 +49,8 @@ static char getdate_module_documentation[] =
 ""
 ;
 
-__attribute__((visibility("default")))
 void
-initgetdate()
+initgetdate(void)
 {
 	PyObject *m, *d;
 
