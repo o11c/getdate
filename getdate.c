@@ -13,6 +13,7 @@ static char getdate_getdate__doc__[] =
 static PyObject *
 getdate_getdate(PyObject *self /* Not used */, PyObject *args)
 {
+    (void)self;
 	time_t result;
     char *buf = 0;
     if (!PyArg_ParseTuple(args, "s", &buf))
@@ -43,6 +44,7 @@ static char getdate_module_documentation[] =
 ""
 ;
 
+__attribute__((visibility("default")))
 void
 initgetdate()
 {

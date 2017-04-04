@@ -5,6 +5,9 @@
 #include <string.h>
 
 
+#define yylval getdate_yylval
+#define yylex getdate_yylex
+
 #define HOUR(x)		((time_t)(x) * 60)
 
 

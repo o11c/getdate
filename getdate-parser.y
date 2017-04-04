@@ -1,3 +1,5 @@
+%name-prefix "getdate_yy"
+
 %{
 /*
 **  Originally written by Steven M. Bellovin <smb@research.att.com> while
@@ -78,9 +80,6 @@
 extern struct tm	*gmtime();
 extern struct tm	*localtime();
 
-#define yyparse getdate_yyparse
-#define yyerror getdate_yyerror
-
 static int yyparse ();
 static int yyerror ();
 
@@ -133,8 +132,7 @@ time_t	yyRelMonth;
 time_t	yyRelSeconds;
 
 
-#define yylex getdate_yylex
-int yylex ();
+int getdate_yylex ();
 }
 
 %expect 10
@@ -388,6 +386,7 @@ static int
 yyerror(s)
     char	*s;
 {
+  (void)s;
   return 0;
 }
 

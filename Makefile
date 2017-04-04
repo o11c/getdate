@@ -14,8 +14,8 @@ LEX = lex
 YACC = yacc
 PYTHON = python
 
-CFLAGS += -Wall
-override CFLAGS += -fPIC
+CFLAGS += -Wall -Wextra
+override CFLAGS += -fPIC -fvisibility=hidden
 override CPPFLAGS += $(shell ${PYTHON}-config --includes)
 override LDFLAGS += -shared -Wl,-z,defs
 override LDLIBS += $(shell ${PYTHON}-config --libs)
