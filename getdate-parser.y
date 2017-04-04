@@ -1,3 +1,4 @@
+%define api.pure full
 %name-prefix "getdate_yy"
 
 %{
@@ -67,9 +68,10 @@ time_t	yyYear;
 MERIDIAN	yyMeridian;
 time_t	yyRelMonth;
 time_t	yyRelSeconds;
+}
 
-
-int getdate_yylex (void);
+%code provides {
+int getdate_yylex (YYSTYPE *yylval);
 time_t get_date(char *, struct timeb *);
 }
 

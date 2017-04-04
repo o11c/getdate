@@ -5,9 +5,6 @@
 #include <string.h>
 
 
-#define yylval getdate_yylval
-#define yylex getdate_yylex
-
 #define HOUR(x)		((time_t)(x) * 60)
 
 
@@ -213,8 +210,7 @@ static TABLE const MilitaryTable[] = {
 
 
 static int
-LookupWord(buff)
-    char		*buff;
+LookupWord(YYSTYPE *yylval, char *buff)
 {
     register char	*p;
     register char	*q;
@@ -228,11 +224,11 @@ LookupWord(buff)
 	    *p = tolower(*p);
 
     if (strcmp(buff, "am") == 0 || strcmp(buff, "a.m.") == 0) {
-	yylval.Meridian = MERam;
+	yylval->Meridian = MERam;
 	return tMERIDIAN;
     }
     if (strcmp(buff, "pm") == 0 || strcmp(buff, "p.m.") == 0) {
-	yylval.Meridian = MERpm;
+	yylval->Meridian = MERpm;
 	return tMERIDIAN;
     }
 
@@ -249,19 +245,19 @@ LookupWord(buff)
     for (tp = MonthDayTable; tp->name; tp++) {
 	if (abbrev) {
 	    if (strncmp(buff, tp->name, 3) == 0) {
-		yylval.Number = tp->value;
+		yylval->Number = tp->value;
 		return tp->type;
 	    }
 	}
 	else if (strcmp(buff, tp->name) == 0) {
-	    yylval.Number = tp->value;
+	    yylval->Number = tp->value;
 	    return tp->type;
 	}
     }
 
     for (tp = TimezoneTable; tp->name; tp++)
 	if (strcmp(buff, tp->name) == 0) {
-	    yylval.Number = tp->value;
+	    yylval->Number = tp->value;
 	    return tp->type;
 	}
 
@@ -270,7 +266,7 @@ LookupWord(buff)
 
     for (tp = UnitsTable; tp->name; tp++)
 	if (strcmp(buff, tp->name) == 0) {
-	    yylval.Number = tp->value;
+	    yylval->Number = tp->value;
 	    return tp->type;
 	}
 
@@ -280,7 +276,7 @@ LookupWord(buff)
 	buff[i] = '\0';
 	for (tp = UnitsTable; tp->name; tp++)
 	    if (strcmp(buff, tp->name) == 0) {
-		yylval.Number = tp->value;
+		yylval->Number = tp->value;
 		return tp->type;
 	    }
 	buff[i] = 's';		/* Put back for "this" in OtherTable. */
@@ -288,7 +284,7 @@ LookupWord(buff)
 
     for (tp = OtherTable; tp->name; tp++)
 	if (strcmp(buff, tp->name) == 0) {
-	    yylval.Number = tp->value;
+	    yylval->Number = tp->value;
 	    return tp->type;
 	}
 
@@ -296,7 +292,7 @@ LookupWord(buff)
     if (buff[1] == '\0' && isalpha(*buff)) {
 	for (tp = MilitaryTable; tp->name; tp++)
 	    if (strcmp(buff, tp->name) == 0) {
-		yylval.Number = tp->value;
+		yylval->Number = tp->value;
 		return tp->type;
 	    }
     }
@@ -311,7 +307,7 @@ LookupWord(buff)
     if (i)
 	for (tp = TimezoneTable; tp->name; tp++)
 	    if (strcmp(buff, tp->name) == 0) {
-		yylval.Number = tp->value;
+		yylval->Number = tp->value;
 		return tp->type;
 	    }
 
@@ -320,7 +316,7 @@ LookupWord(buff)
 
 
 int
-yylex()
+getdate_yylex(YYSTYPE *yylval)
 {
     register char	c;
     register char	*p;
@@ -341,11 +337,11 @@ yylex()
 	    }
 	    else
 		sign = 0;
-	    for (yylval.Number = 0; isdigit(c = *yyInput++); )
-		yylval.Number = 10 * yylval.Number + c - '0';
+	    for (yylval->Number = 0; isdigit(c = *yyInput++); )
+		yylval->Number = 10 * yylval->Number + c - '0';
 	    yyInput--;
 	    if (sign < 0)
-		yylval.Number = -yylval.Number;
+		yylval->Number = -yylval->Number;
 	    return sign ? tSNUMBER : tUNUMBER;
 	}
 	if (isalpha(c)) {
@@ -354,7 +350,7 @@ yylex()
 		    *p++ = c;
 	    *p = '\0';
 	    yyInput--;
-	    return LookupWord(buff);
+	    return LookupWord(yylval, buff);
 	}
 	if (c != '(')
 	    return *yyInput++;
